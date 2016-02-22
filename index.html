@@ -2,230 +2,33 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>WebScape</title>
-    <link rel="stylesheet" src="//normalize-css.googlecode.com/svn/trunk/normalize.css" />
+	<meta name="author" content="Steven Kneiser">
+    <title>3d-repo</title>
+    <link rel="stylesheet" src="https://normalize-css.googlecode.com/svn/trunk/normalize.css" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="./css/style.css">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Oswald:300,400,700" rel="stylesheet" type="text/css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-    <script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	<script type="text/javascript" src="./js/index.js"></script>
+    <!--
     <script src="https://ajax.googleapis.com/ajax/libs/threejs/r69/three.min.js"></script>
     <script src="https://dl.dropboxusercontent.com/u/3587259/Code/Threejs/OrbitControls.js"></script>
-    <script type="x-shader/x-fragment" id="fragmentshader">
-uniform sampler2D texture;
-varying vec3 vColor; // colors associated to vertices, assigned by vertex shader
-void main() 
-{
-    // calculates a color for the particle
-    gl_FragColor = vec4( vColor, 1.0 );
-    // sets a white particle texture to desired color
-    gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord );
-}
-    </script>
-    <script type="x-shader/x-vertex" id="vertexshader">
-uniform float time;
-attribute vec3 customColor;
-varying vec3 vColor;
-void main() 
-{
-    vColor = customColor; // set color associated to vertex; use later in fragment shader.
-
-    vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-
-    // option (1): draw particles at constant size on screen
-    // gl_PointSize = size;
-    // option (2): scale particles as objects in 3D space
-    gl_PointSize = 40.0 * ( 300.0 / length( mvPosition.xyz ) );
-    gl_Position = projectionMatrix * mvPosition;
-}
-    </script>
-    <script id="fragment_shader3" type="x-shader/x-fragment">
-
-      uniform float time;
-      uniform vec2 resolution;
-
-      varying vec2 vUv;
-
-      void main( void ) {
-
-      vec2 position = vUv;
-
-      float color = 0.0;
-      color += sin( position.x * cos( time / 15.0 ) * 80.0 ) + cos( position.y * cos( time / 15.0 ) * 10.0 );
-      color += sin( position.y * sin( time / 10.0 ) * 40.0 ) + cos( position.x * sin( time / 25.0 ) * 40.0 );
-      color += sin( position.x * sin( time / 5.0 ) * 10.0 ) + sin( position.y * sin( time / 35.0 ) * 80.0 );
-      color *= sin( time / 10.0 ) * 0.5;
-
-      gl_FragColor = vec4( vec3( color, color * 0.5, sin( color + time / 3.0 ) * 0.75 ), 1.0 );
-
-      }
-
-    </script><!--
-    <script id="vertexShader" type="x-shader/x-vertex">
-
-      varying vec2 vUv;
-
-      void main()
-      {
-      vUv = uv;
-      vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-      gl_Position = projectionMatrix * mvPosition;
-      }
-
-    </script>-->
-    <script id="vertexShader" type="x-shader/x-vertex">
-uniform sampler2D noiseTexture;
-uniform float noiseScale;
-
-uniform sampler2D bumpTexture;
-uniform float bumpSpeed;
-uniform float bumpScale;
-
-uniform float time;
-
-varying vec2 vUv;
-
-void main() 
-{ 
-    vUv = uv;
-    
-    vec2 uvTimeShift = vUv + vec2( 1.1, 1.9 ) * time * bumpSpeed;
-    vec4 noiseGeneratorTimeShift = texture2D( noiseTexture, uvTimeShift );
-    vec2 uvNoiseTimeShift = vUv + noiseScale * vec2( noiseGeneratorTimeShift.r, noiseGeneratorTimeShift.g );
-    // below, using uvTimeShift seems to result in more of a "rippling" effect
-    //   while uvNoiseTimeShift seems to result in more of a "shivering" effect
-    vec4 bumpData = texture2D( bumpTexture, uvTimeShift );
-
-    // move the position along the normal
-    //  but displace the vertices at the poles by the same amount
-    float displacement = ( vUv.y > 0.999 || vUv.y < 0.001 ) ? 
-        bumpScale * (0.3 + 0.02 * sin(time)) :  
-        bumpScale * bumpData.r;
-    vec3 newPosition = position + normal * displacement;
-    
-    gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
-}
-    </script>
-    <!--<script id="vertexShader" type="x-shader/x-vertex">
-      //varying vec2 vUv;
-      //void main()
-      //{
-      //    vUv = uv;
-      //    gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-      //}
-      uniform sampler2D noiseTexture;
-      uniform float noiseScale;
-      uniform sampler2D bumpTexture;
-      uniform float bumpSpeed;
-      uniform float bumpScale;
-      uniform float time;
-      varying vec2 vUv;
-
-      void main()
-      {
-      vUv = uv;
-
-      vec2 uvTimeShift = vUv + vec2( 1.1, 1.9 ) * time * bumpSpeed;
-      vec4 noiseGeneratorTimeShift = texture2D( noiseTexture, uvTimeShift );
-      vec2 uvNoiseTimeShift = vUv + noiseScale * vec2( noiseGeneratorTimeShift.r, noiseGeneratorTimeShift.g );
-      // below, using uvTimeShift seems to result in more of a "rippling" effect
-      //   while uvNoiseTimeShift seems to result in more of a "shivering" effect
-      vec4 bumpData = texture2D( bumpTexture, uvTimeShift );
-      // move the position along the normal
-      //  but displace the vertices at the poles by the same amount
-      float displacement = ( vUv.y > 0.999 || vUv.y < 0.001 ) ?
-						      bumpScale * (0.3 + 0.02 * sin(time)) :
-						      bumpScale * bumpData.r;
-						      vec3 newPosition = position + normal * displacement;
-
-						      gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
-						      }
-
-    </script>
-
-    <script id="fragment_shader3" type="x-shader/x-vertex">
-      //uniform sampler2D baseTexture;
-      //uniform float baseSpeed;
-      //uniform sampler2D noiseTexture;
-      //uniform float noiseScale;
-      //uniform float alpha;
-      //uniform float time;
-      //varying vec2 vUv;
-      //void main()
-      //{
-      //    vec2 uvTimeShift = vUv + vec2( -0.7, 1.5 ) * time * baseSpeed;
-      //    vec4 noiseGeneratorTimeShift = texture2D( noiseTexture, uvTimeShift );
-      //    vec2 uvNoiseTimeShift = vUv + noiseScale * vec2( noiseGeneratorTimeShift.r, noiseGeneratorTimeShift.b );
-      //    vec4 baseColor = texture2D( baseTexture, uvNoiseTimeShift );
-      //    baseColor.a = alpha;
-      //    gl_FragColor = baseColor;
-      //}
-      uniform sampler2D baseTexture;
-      uniform float baseSpeed;
-      uniform float repeatS;
-      uniform float repeatT;
-      uniform sampler2D noiseTexture;
-      uniform float noiseScale;
-      uniform sampler2D blendTexture;
-      uniform float blendSpeed;
-      uniform float blendOffset;
-      uniform float time;
-      uniform float alpha;
-      varying vec2 vUv;
-      void main()
-      {
-      vec2 uvTimeShift = vUv + vec2( -0.7, 1.5 ) * time * baseSpeed;
-      vec4 noiseGeneratorTimeShift = texture2D( noiseTexture, uvTimeShift );
-      vec2 uvNoiseTimeShift = vUv + noiseScale * vec2( noiseGeneratorTimeShift.r, noiseGeneratorTimeShift.b );
-      vec4 baseColor = texture2D( baseTexture, uvNoiseTimeShift * vec2(repeatS, repeatT) );
-      vec2 uvTimeShift2 = vUv + vec2( 1.3, -1.7 ) * time * blendSpeed;
-      vec4 noiseGeneratorTimeShift2 = texture2D( noiseTexture, uvTimeShift2 );
-      vec2 uvNoiseTimeShift2 = vUv + noiseScale * vec2( noiseGeneratorTimeShift2.g, noiseGeneratorTimeShift2.b );
-      vec4 blendColor = texture2D( blendTexture, uvNoiseTimeShift2 * vec2(repeatS, repeatT) ) - blendOffset * vec4(1.0, 1.0, 1.0, 1.0);
-      vec4 theColor = baseColor + blendColor;
-      theColor.a = alpha;
-      gl_FragColor = theColor;
-      }
-    </script>-->
+	-->
   </head>
   <body>
-  <audio autoplay loop><source src="./TheCliff.mp3" type="audio/mpeg"></audio>
-    <div id="welcome">
-      <p>Welcome</p>
-      <form role="form" class="search" onsubmit="searchInit()">
-        <i class="fa fa-search"></i>
-        <input type="search" class="form-control searchbar" placeholder="Enter a url to begin">
-        <input type="submit" class="submit">
-      </form>
-    </div>
-
-    <div id="buttonWrapper">
-      <button class="c-hamburger c-hamburger--htla">
-        <span>toggle menu</span>
-      </button>
-    </div>
-
-    <div id="sidebar">
-      
-      <h1>WEB<span id="scape">scape</span></h1>
-      
-      <form role="form" class="search" onsubmit="searchPost()">
-      	<i class="fa fa-search"></i>
-      	<input type="search" class="form-control searchbar searchbar2" placeholder="Search">
-        <input type="submit" class="submit">
-      </form>
-
-      <section class="site-info">
-        <h2 id="title">wikipedia.com</h2>
-      </section>
-    </div>
-
-    <div id="render">
-
-      <canvas id="canvas"></canvas>
-    </div>
-    <script src="scape2.js"></script>
-    <script src="armadillo.js"></script>
+	<header>	
+		<h1>Tree Assembly</h1>
+		<form style="position: absolute;  left: 50px;">
+			<p>Key</p>
+			<input id="in_key" style="color: black;" type="text" name="key">
+			<p>Parent ID</p>
+			<input id="in_pid" style="color: black;" type="text" name="pid">
+			<button id="insert" type="button">Insert Node</button>
+		</form>
+	</header>
+	<div id="tree">
+	</div>
   </body>
 </html>
+

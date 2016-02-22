@@ -1,11 +1,39 @@
-body{
-	margin: 0;
-	background-color: #11051C;
+body {
+	position: absolute;
+	margin: 0 auto;
+	height: 100%;
+	width: 100%;
+	top: 0;
+	left: 0;
 	color: white;
+	background-color: gray;
 	font-family: "Montserrat", sans-serif;
-	overflow: hidden;
 }
 
+header {
+	position: fixed;
+	left: 0;
+	top: 0;
+	height: 30%;
+	width: 100%;
+	background-color: #555555;
+}
+
+#tree {
+	position: fixed;
+	width: 100%;
+	height: 70%;
+	top: 30%;
+	background-color: black;
+}
+
+.node {
+	position: relative;
+	padding-top: -5px;
+	padding-left: 25px;
+}
+
+/*
 #welcome{
 	position: absolute;
 	height: 200px;
@@ -63,7 +91,7 @@ body{
 	display: flex;
 	font-size: 16px;
 	/*-webkit-justify-content: center;
-	justify-content: center;*/
+	justify-content: center;
 	padding: 10px;
 	margin: 13px 0 26px 0;
 	border: solid white 2px;
@@ -154,7 +182,7 @@ p{
 }
 
 
-/* hamburger */
+/* hamburger
 .c-hamburger {
   visibility: hidden;
   display: inline-block;
@@ -235,7 +263,7 @@ p{
           transition: transform 0.3s, width 0.3s, bottom 0.3s;
 }
 
-/* active state, i.e. menu open */
+/* active state, i.e. menu open
 
 .c-hamburger--htla.is-active span {
   -webkit-transform: rotate(180deg);
@@ -280,3 +308,4 @@ p{
     border-bottom: 2px solid white;
 
 }
+*/
