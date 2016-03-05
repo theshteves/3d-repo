@@ -2,9 +2,7 @@ tree_size = 0;
 
 var insert = function(id, pid, key) {
 	
-	// For debugging:
-	console.log("id: " + id + "\npid: " + pid + "\nkey: " + key);	
-
+	//console.log("id: " + id + "\npid: " + pid + "\nkey: " + key);
 	// Create new node
 	var new_node = document.createElement("div");
 	new_node.setAttribute("id", id);
@@ -20,6 +18,7 @@ var insert = function(id, pid, key) {
 	// Insert node into tree
 	if (pid == 0) {
 		document.getElementById("tree").appendChild(new_node);
+
 	} else {
 		document.getElementById(pid).appendChild(new_node);
 	}
@@ -38,30 +37,17 @@ var get = function(url) {
 			JSON.parse(xhttp.responseText).forEach(function(node) {
 
 				key = node["path"];
-				console.log("node: " + key);
-					
-				if (key.split("/").length == 1) {
-					tree_size = insert(key, 0, key);
+				//console.log("node: " + key);
 
-				} else {
-					root = key.split("/").slice(0, -1).join("/");
-	
-					// Find parent node to attach to
-					while (root.split("/").length > 1) {
-						if (!document.getElementById(root)) {
-							tree_size = insert(root, root.split("/").slice(0, -1).join("/"), root);
-						}
+				if (!document.getElementById(key)) {
+					if (node["type"] == "dir") {
 
-						root = root.split("/").slice(0, -1).join("/");
-					}
-					
-					if (!document.getElementById(key)) {
+						tree_size = insert(key, key.split("/").slice(0, -1).join("/"), key + "/");
+						get("https://api.github.com/repos/theshteves/web-roast/contents/" + node["path"]);
+
+					} else {
 						tree_size = insert(key, key.split("/").slice(0, -1).join("/"), key);
 					}
-				}
-					
-				if (node["type"] == "dir") {
-					get("https://api.github.com/repos/theshteves/web-roast/contents/" + node["path"]);
 				}
 			});			
     	}
