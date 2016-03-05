@@ -43,7 +43,8 @@ var get = function(url) {
 					if (node["type"] == "dir") {
 
 						tree_size = insert(key, key.split("/").slice(0, -1).join("/"), key + "/");
-						get("https://api.github.com/repos/theshteves/web-roast/contents/" + node["path"]);
+						console.log("GET: " + url + "\n=> " + node["path"]);
+						get(url + "/" + node["path"].split("/").pop());
 
 					} else {
 						tree_size = insert(key, key.split("/").slice(0, -1).join("/"), key);
@@ -62,7 +63,7 @@ $(document).ready(function() {
 
 	$("#insert").click(function() {
 		//tree_size = insert(tree_size, $("#in_pid").val(), $("#in_key").val());	
-		get("https://api.github.com/repos/theshteves/web-roast/contents");	
+		get("https://api.github.com/repos/" + $("#in_user").val() + "/" + $("#in_repo").val() + "/contents");
 	});
 
 });
